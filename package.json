@@ -7,9 +7,10 @@
         "start:dev": "nodemon ./server.js"
     },
     "dependencies": {
+        "dotenv": "^9.0.2",
         "express": "^4.17.1",
-        "rootpath": "^0.1.2",
-        "dotenv": "^9.0.2"
+        "mongoose": "^5.12.10",
+        "rootpath": "^0.1.2"
     },
     "devDependencies": {
         "dotenv": "^9.0.2",
