@@ -256,8 +256,8 @@ function basicDetails(user) {
  * @returns {{role, tsModified, name, fullName, modifiedBy, isActive}}
  */
 function updateModel(user) {
-    const { name , fullName, role, tsModified, isActive, modifiedBy} = user;
-    return { name , fullName, role, tsModified, isActive, modifiedBy};
+    const { fullName, role, tsModified, isActive, modifiedBy} = user;
+    return { fullName, role, tsModified, isActive, modifiedBy};
 }
 
 /***

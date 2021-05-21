@@ -36,7 +36,7 @@ async function create(data) {
         await incident.save();
     }
     catch (e) {
-        throw 'User create failed'
+        throw 'Failed to create incident data'
     }
     return incident;
 }
@@ -57,7 +57,7 @@ async function update(id, data) {
         });
     }
     catch (e) {
-        throw 'Incident update failed.'
+        throw 'Failed to update incident data'
     }
     return new Incident(doc);
 }
@@ -73,4 +73,15 @@ async function getIncident(id) {
     const incident = await db.Incident.findById(id);
     if (!incident) throw 'Incident data not found';
     return incident;
+}
+
+
+/***
+ *
+ * @param user
+ * @returns {{role, tsModified, name, fullName, modifiedBy, isActive}}
+ */
+function updateModel(incident) {
+    const {typeOfIncident, location, datetimeOfIncident, nameOfAffected, nameOfSupervisor, descriptionOfIncident, rootCaseOfAccident, nameOfHandler, isAcknowledged, tsAcknowledged, isResolved, comment, tsResolved, tsModified, isActive, modifiedBy} = incident;
+    return { typeOfIncident, location, datetimeOfIncident, nameOfAffected, nameOfSupervisor, descriptionOfIncident, rootCaseOfAccident, nameOfHandler, isAcknowledged, tsAcknowledged, isResolved, comment, tsResolved, tsModified, isActive, modifiedBy};
 }
