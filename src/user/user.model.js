@@ -6,8 +6,6 @@ const schema = new Schema({
     email: { type: String, unique: true, required: true },
     passwordHash: { type: String, required: true },
     role: { type: String, required: true },
-    registeredDate: { type: Date },
-    expiredDate: { type: String },
     isActive: { type: Boolean },
     tsCreated: { type: Date },
     tsModified: { type: Date },

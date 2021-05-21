@@ -1,0 +1,4 @@
+{
+  "connectionString": "mongodb://localhost:27017/incident_mgmt_db",
+  "secret": "incidient_mgmt_secrect@2021"
+}

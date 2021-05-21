@@ -7,10 +7,12 @@
         "start:dev": "nodemon ./server.js"
     },
     "dependencies": {
+        "bcryptjs": "^2.4.3",
         "dotenv": "^9.0.2",
         "express": "^4.17.1",
         "mongoose": "^5.12.10",
-        "rootpath": "^0.1.2"
+        "rootpath": "^0.1.2",
+        "jsonwebtoken": "^8.5.1"
     },
     "devDependencies": {
         "dotenv": "^9.0.2",
