@@ -93,7 +93,6 @@ async function changePassword(id, data) {
  */
 async function authenticate({ email, password, ipAddress }) {
     const user = await db.User.findOne({ email });
-
     if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
         throw 'Email or password is incorrect';
     }
