@@ -8,6 +8,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const errorHandler = require('src/_middleware/error-handler');
 const userRoute = require('./src/user/user.controller');
+const incidentRoute = require('./src/incident/incident.controller');
 
 dotenv.config();
 
@@ -23,6 +24,8 @@ app.use(cors({ origin: (origin, callback) => callback(null, true), credentials: 
 
 // api routes
 app.use('/api/users', userRoute);
+
+app.use('/api/incidents', incidentRoute);
 
 app.get('/', function (req, res, next) {
 

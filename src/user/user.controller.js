@@ -113,17 +113,12 @@ function revokeToken(req, res, next) {
  * @param next
  */
 function create(req, res, next) {
-    const {name, email, role, expiredDate, company, accountType, image} = req.body;
+    const {fullName, email, role, password } = req.body;
     const user = new User({
-        name,
+        fullName,
         email,
-        passwordHash: bcrypt.hashSync('P@ssword', 10),
-        image,
-        role: role,
-        company,
-        expiredDate,
-        accountType,
-        registeredDate: Date.now(),
+        passwordHash: bcrypt.hashSync(password, 10),
+        role,
         tsCreated: Date.now(),
         tsModified: Date.now(),
         modifiedBy: req.user.id,
@@ -142,22 +137,20 @@ function create(req, res, next) {
  */
 function update(req, res, next) {
     const id = req.params.id;
-    const {name, email, role, expiredDate, company, accountType, image} = req.body;
-    const user = new User({
-        name,
-        email,
-        role: role,
-        company,
-        image,
-        expiredDate: new Date(expiredDate),
-        tsModified: Date.now(),
-        modifiedBy: req.user.id,
-        accountType,
-        isActive: true
-    });
-    userService.update(id, user)
-        .then(user => user ? res.json(user): res.status(422).send({error: "Failed to update user."}))
-        .catch(next);
+    const {fullName, role} = req.body;
+
+    userService.getById(id)
+        .then(response => {
+            const newUser = new User(response);
+            newUser.fullName = fullName ? fullName : newUser.fullName;
+            newUser.role = role ? role : newUser.role;
+            newUser.tsModified = Date.now();
+            newUser.modifiedBy = req.user.id;
+
+            userService.update(id, newUser)
+                .then(user => user ? res.json(user): res.status(422).send({error: "Failed to update user."}))
+                .catch(next);
+        });
 }
 
 /***
@@ -181,7 +174,7 @@ function getAll(req, res, next) {
  */
 function getById(req, res, next) {
     // regular users can get their own record and admins can get any record
-    if (req.params.id !== req.user.id && req.user.role !== Role.Super) {
+    if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
@@ -215,7 +208,6 @@ function getRefreshTokens(req, res, next) {
  * @param next
  */
 function changePassword(req, res, next) {
-    const id = req.params.id;
     const { password, newPassword } = req.body;
 
     userService.changePassword(req.params.id, {password, newPassword})
