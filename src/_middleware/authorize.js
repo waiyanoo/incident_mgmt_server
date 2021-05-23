@@ -24,7 +24,7 @@ function authorize(roles = []) {
         jwt({ secret: auth_secrect, algorithms: ['HS256'] }),
         // authorize based on user role
         async (req, res, next) => {
-        console.log(req.user)
+            console.log(req.user)
             const user = await db.User.findById(req.user.id);
             console.log(user);
             if (!user || (roles.length && !roles.includes(user.role))) {

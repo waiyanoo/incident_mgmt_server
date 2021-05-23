@@ -10,19 +10,35 @@ module.exports = {
 
 /**
  *
- * @param id : string
+ * @param id
  * @returns {Promise<Incident>}
  */
 async function getById(id) {
-    return await getIncident(id);
+    try{
+        return await getIncident(id);
+    }catch (e) {
+        throw 'Failed to retrieve incident'
+    }
 }
 
 /**
  *
- * @returns {Promise<Query<Array<EnforceDocument<Incident, {}>>, Document<any, any>, {}>>}
+ * @param filter
+ * @param sort
+ * @returns {Promise<Array<EnforceDocument<unknown, {}>>>}
  */
-async function getAll() {
-    return db.Incident.find();
+async function getAll(filter, sort) {
+    filter.isActive = true;
+    let mongoFilter = {$and : []};
+    try{
+        mongoFilter.$and.push({ isActive: true });
+        filter.typeOfIncident ?  mongoFilter.$and.push({typeOfIncident : filter.typeOfIncident }) : '';
+        return await db.Incident.find(mongoFilter).sort().exec();
+    }catch (e) {
+        console.log(e);
+        throw 'Failed to retrieve incident'
+    }
+
 }
 
 /***
@@ -31,14 +47,14 @@ async function getAll() {
  * @returns {Promise<Incident>}
  */
 async function create(data) {
-    const incident = new db.Incident(data);
     try{
+        const incident = new db.Incident(data);
         await incident.save();
+        return incident;
     }
     catch (e) {
         throw 'Failed to create incident data'
     }
-    return incident;
 }
 
 /**
@@ -48,18 +64,18 @@ async function create(data) {
  * @returns {Promise<Incident>}
  */
 async function update(id, data) {
-    const filter = { _id: id };
-    const update = updateModel(data);
-    let doc;
     try{
+        const filter = { _id: id };
+        const update = updateModel(data);
+        let doc;
         doc = await db.Incident.findOneAndUpdate(filter, update, {
             new: true
         });
+        return new Incident(doc);
     }
     catch (e) {
         throw 'Failed to update incident data'
     }
-    return new Incident(doc);
 }
 
 /***
@@ -68,11 +84,15 @@ async function update(id, data) {
  * @returns {Promise<Incident>}
  */
 async function getIncident(id) {
-    if (!db.isValidId(id)) throw 'Incident data not found';
+    try{
+        if (!db.isValidId(id)) throw 'Incident data not found';
 
-    const incident = await db.Incident.findById(id);
-    if (!incident) throw 'Incident data not found';
-    return incident;
+        const incident = await db.Incident.findById(id);
+        if (!incident) throw 'Incident data not found';
+        return incident;
+    }catch (e) {
+        throw 'Failed to retrieve incident'
+    }
 }
 
 

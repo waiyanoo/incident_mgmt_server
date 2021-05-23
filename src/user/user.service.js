@@ -94,11 +94,11 @@ async function authenticate({ email, password, ipAddress }) {
     }
 
     // authentication successful so generate jwt and refresh tokens
-    const jwtToken = generateJwtToken(user);
+    const token = generateJwtToken(user);
 
     return {
         ...basicDetails(user),
-        jwtToken
+        token
     };
 }
 

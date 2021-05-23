@@ -23,9 +23,21 @@ module.exports = router;
  * @param next
  */
 function getById(req, res, next) {
+    const meta = {
+        id: req.params.id
+    }
     _incidentService.getById(req.params.id)
-        .then(user => user ? res.json(user) : res.status(404).send({error: "Incident data not found."}))
-        .catch(next);
+        .then(data => res.json({
+            meta,
+            data
+        }))
+        .catch(error => res.json({
+            meta,
+            error: {
+                message: error
+            }
+        }))
+        .finally(next);
 }
 
 /***
@@ -35,9 +47,25 @@ function getById(req, res, next) {
  * @param next
  */
 function getAll(req, res, next) {
-    _incidentService.getAll()
-        .then(incident => res.json(incident))
-        .catch(next);
+    const options = req.query;
+    const sort = options.sort || {};
+    const filter = options.filter || {};
+    const meta = {sort, filter};
+    _incidentService.getAll(filter, sort)
+        .then(data => {
+            meta.total = data.length;
+            res.json({
+                meta,
+                data
+            })
+        })
+        .catch(error => res.json({
+            meta,
+            error: {
+                message: error
+            }
+        }))
+        .finally(next);
 }
 
 /***
@@ -67,9 +95,19 @@ function create(req, res, next) {
         modifiedBy: req.user.id,
         isActive: true
     });
+    const meta = {};
     _incidentService.create(incident)
-        .then(incident => incident ? res.json(incident): res.status(422).send({error: "Failed to create incident data."}))
-        .catch(next);
+        .then(data => res.json({
+            meta,
+            data
+        }))
+        .catch(error => res.json({
+            meta,
+            error: {
+                message: error
+            }
+        }))
+        .finally(next);
 }
 
 /***
@@ -95,10 +133,19 @@ function update(req, res, next) {
             incident.nameOfHandler = nameOfHandler;
             incident.tsModified = Date.now();
             incident.modifiedBy = req.user.id;
-
+            const meta = {};
             _incidentService.update(id, incident)
-                .then(user => user ? res.json(user): res.status(422).send({error: "Failed to update incident data."}))
-                .catch(next);
+                .then(data => res.json({
+                    meta,
+                    data
+                }))
+                .catch(error => res.json({
+                    meta,
+                    error: {
+                        message: error
+                    }
+                }))
+                .finally(next);
         });
 }
 
@@ -118,10 +165,19 @@ function acknowledge(req, res, next) {
             incident.tsAcknowledged = Date.now();
             incident.tsModified = Date.now();
             incident.modifiedBy = req.user.id;
-
+            const meta = {};
             _incidentService.update(id, incident)
-                .then(user => user ? res.json(user): res.status(422).send({error: "Failed to update incident data."}))
-                .catch(next);
+                .then(data => res.json({
+                    meta,
+                    data
+                }))
+                .catch(error => res.json({
+                    meta,
+                    error: {
+                        message: error
+                    }
+                }))
+                .finally(next);
         });
 }
 
@@ -143,9 +199,18 @@ function resolve(req, res, next) {
             incident.comment = comment;
             incident.tsModified = Date.now();
             incident.modifiedBy = req.user.id;
-
+            const meta = {};
             _incidentService.update(id, incident)
-                .then(user => user ? res.json(user): res.status(422).send({error: "Failed to update incident data."}))
-                .catch(next);
+                .then(data => res.json({
+                    meta,
+                    data
+                }))
+                .catch(error => res.json({
+                    meta,
+                    error: {
+                        message: error
+                    }
+                }))
+                .finally(next);
         });
 }
