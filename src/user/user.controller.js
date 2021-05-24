@@ -56,7 +56,6 @@ function authenticate(req, res, next) {
  * @param next
  */
 function create(req, res, next) {
-    console.log(req.body)
     const {fullName, email, role, password } = req.body;
     const user = new User({
         fullName,
@@ -104,9 +103,22 @@ function update(req, res, next) {
  * @param next
  */
 function getAll(req, res, next) {
+    const meta = {}
     userService.getAll()
-        .then(users => res.json(users))
-        .catch(next);
+        .then(data => {
+        meta.total = data.length;
+        res.json({
+            meta,
+            data
+        })
+    })
+        .catch(error => res.json({
+            meta,
+            error: {
+                message: error
+            }
+        }))
+        .finally(next);
 }
 
 /***
@@ -121,28 +133,21 @@ function getById(req, res, next) {
     if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
-
-    userService.getById(req.params.id)
-        .then(user => user ? res.json(user) : res.sendStatus(404))
-        .catch(next);
-}
-
-/***
- *
- * @param req
- * @param res
- * @param next
- * @returns {*}
- */
-function getRefreshTokens(req, res, next) {
-    // users can get their own refresh tokens and admins can get any user's refresh tokens
-    if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
-        return res.status(401).json({ message: 'Unauthorized' });
+    const meta = {
+        id: req.params.id
     }
-
-    userService.getRefreshTokens(req.params.id)
-        .then(tokens => tokens ? res.json(tokens) : res.sendStatus(404))
-        .catch(next);
+    userService.getById(req.params.id)
+        .then(data => res.json({
+            meta,
+            data
+        }))
+        .catch(error => res.json({
+            meta,
+            error: {
+                message: error
+            }
+        }))
+        .finally(next);
 }
 
 /***
@@ -153,10 +158,19 @@ function getRefreshTokens(req, res, next) {
  */
 function changePassword(req, res, next) {
     const { password, newPassword } = req.body;
-
+    const meta = {};
     userService.changePassword(req.params.id, {password, newPassword})
-        .then( user => user ? res.json(user) : res.status(422).send({error: "Failed to update password."}))
-        .catch(next);
+        .then(data => res.json({
+            meta,
+            data
+        }))
+        .catch(error => res.json({
+            meta,
+            error: {
+                message: error
+            }
+        }))
+        .finally(next);
 }
 
 // helper functions

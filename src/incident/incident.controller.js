@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const authorize = require('src/_middleware/authorize');
-
+const userService = require('../user/user.service');
 const Role = require('src/_helpers/role');
 const Incident = require('./incident.model');
 const _incidentService = require('./incident.service');
 // routes
-router.get('', authorize(Role.Admin), getAll);
+router.get('', authorize(), getAll);
 router.get('/:id', authorize(), getById);
 router.post('', authorize(Role.Admin), create);
 router.put('/:id', authorize(Role.Admin), update);
@@ -51,21 +51,33 @@ function getAll(req, res, next) {
     const sort = options.sort || {};
     const filter = options.filter || {};
     const meta = {sort, filter};
-    _incidentService.getAll(filter, sort)
-        .then(data => {
-            meta.total = data.length;
-            res.json({
-                meta,
-                data
-            })
+    let currentUser = null;
+    userService.getById(req.user.id)
+        .then(user => {
+            currentUser = user;
+            console.log(currentUser)
+            _incidentService.getAll(filter, sort)
+                .then(data => {
+                    meta.total = data.length;
+
+                    if(currentUser.role === 'User'){
+                        data = data.filter(incident => incident.nameOfHandler === currentUser.id);
+                    }
+                    console.log(data)
+                    res.json({
+                        meta,
+                        data
+                    })
+                })
+                .catch(error => res.json({
+                    meta,
+                    error: {
+                        message: error
+                    }
+                }))
+                .finally(next);
         })
-        .catch(error => res.json({
-            meta,
-            error: {
-                message: error
-            }
-        }))
-        .finally(next);
+
 }
 
 /***

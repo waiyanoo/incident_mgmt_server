@@ -10,15 +10,26 @@ async function createTestUser() {
         const user = new db.User(
         {
             fullName: 'User',
-            username: 'User',
             email: 'user@mail.com',
-            passwordHash: bcrypt.hashSync('user', 10),
+            passwordHash: bcrypt.hashSync('P@ssword1', 10),
             role: Role.User,
             isActive: true,
             tsCreated: new Date(),
             tsModified: new Date(),
-            modifiedBy: ''
+            modifiedBy: 'System'
         });
         await user.save();
+        const admin = new db.User(
+            {
+                fullName: 'Admin',
+                email: 'admin@mail.com',
+                passwordHash: bcrypt.hashSync('P@ssword1', 10),
+                role: Role.Admin,
+                isActive: true,
+                tsCreated: new Date(),
+                tsModified: new Date(),
+                modifiedBy: 'System'
+            });
+        await admin.save();
     }
 }

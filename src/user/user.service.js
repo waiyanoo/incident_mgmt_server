@@ -19,14 +19,14 @@ module.exports = {
  * @returns {Promise<User>}
  */
 async function create(data) {
-    const user = new db.User(data);
     try{
+        const user = new db.User(data);
         await user.save();
+        return user;
     }
     catch (e) {
         throw 'User create failed'
     }
-    return user;
 }
 
 /***
@@ -36,18 +36,18 @@ async function create(data) {
  * @returns {Promise<User>}
  */
 async function update(id, data) {
-    const filter = { _id: id };
-    const update = updateModel(data);
-    let doc;
     try{
+        const filter = { _id: id };
+        const update = updateModel(data);
+        let doc;
         doc = await db.User.findOneAndUpdate(filter, update, {
             new: true
         });
+        return new User(doc);
     }
     catch (e) {
         throw 'User update failed.'
     }
-    return new User(doc);
 }
 
 /***
@@ -107,7 +107,13 @@ async function authenticate({ email, password, ipAddress }) {
  * @returns {Promise<Query<Array<EnforceDocument<User>>, Document<User>, {}>>}
  */
 async function getAll() {
-    return db.User.find();
+    try{
+        return await db.User.find();
+    }catch (e) {
+        console.log(e);
+        throw 'Failed to retrieve users'
+    }
+
 }
 
 /***
@@ -116,7 +122,12 @@ async function getAll() {
  * @returns {Promise<User>}
  */
 async function getById(id) {
-    return await getUser(id);
+    try{
+        return await getUser(id);
+    }catch (e) {
+        console.log(e);
+        throw 'Failed to retrieve user'
+    }
 }
 
 /***
