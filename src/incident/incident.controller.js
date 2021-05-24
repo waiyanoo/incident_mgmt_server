@@ -31,7 +31,7 @@ function getById(req, res, next) {
             meta,
             data
         }))
-        .catch(error => res.json({
+        .catch(error => res.status(400).send({
             meta,
             error: {
                 message: error
@@ -55,7 +55,6 @@ function getAll(req, res, next) {
     userService.getById(req.user.id)
         .then(user => {
             currentUser = user;
-            console.log(currentUser)
             _incidentService.getAll(filter, sort)
                 .then(data => {
                     meta.total = data.length;
@@ -63,13 +62,12 @@ function getAll(req, res, next) {
                     if(currentUser.role === 'User'){
                         data = data.filter(incident => incident.nameOfHandler === currentUser.id);
                     }
-                    console.log(data)
                     res.json({
                         meta,
                         data
                     })
                 })
-                .catch(error => res.json({
+                .catch(error => res.status(400).send({
                     meta,
                     error: {
                         message: error
@@ -113,7 +111,7 @@ function create(req, res, next) {
             meta,
             data
         }))
-        .catch(error => res.json({
+        .catch(error => res.status(400).send({
             meta,
             error: {
                 message: error
@@ -151,7 +149,7 @@ function update(req, res, next) {
                     meta,
                     data
                 }))
-                .catch(error => res.json({
+                .catch(error => res.status(400).send({
                     meta,
                     error: {
                         message: error
@@ -183,7 +181,7 @@ function acknowledge(req, res, next) {
                     meta,
                     data
                 }))
-                .catch(error => res.json({
+                .catch(error => res.status(400).send({
                     meta,
                     error: {
                         message: error
@@ -217,7 +215,7 @@ function resolve(req, res, next) {
                     meta,
                     data
                 }))
-                .catch(error => res.json({
+                .catch(error => res.status(400).send({
                     meta,
                     error: {
                         message: error

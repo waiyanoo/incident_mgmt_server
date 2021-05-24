@@ -7,7 +7,7 @@ const schema = new Schema({
     datetimeOfIncident: { type: String, required: true },
     nameOfAffected: { type: String, required: true },
     nameOfSupervisor: { type: String, required: true },
-    descriptionOfIncident: { type: String, required: true },
+    descriptionOfIncident: { type: String },
     rootCaseOfAccident: { type: String, required: true },
     nameOfHandler: { type: String},
     isAcknowledged: { type: Boolean},

@@ -67,9 +67,19 @@ function create(req, res, next) {
         modifiedBy: req.user.id,
         isActive: true
     });
+    const meta = {};
     userService.create(user)
-        .then(user => user ? res.json(user): res.status(422).send({error: "Failed to create user."}))
-        .catch(next);
+        .then(data => res.json({
+            meta,
+            data
+        }))
+        .catch(error => res.status(400).send({
+            meta,
+            error: {
+                message: error
+            }
+        }))
+        .finally(next);
 }
 
 /***
@@ -89,10 +99,19 @@ function update(req, res, next) {
             newUser.role = role ? role : newUser.role;
             newUser.tsModified = Date.now();
             newUser.modifiedBy = req.user.id;
-
+            const meta = {};
             userService.update(id, newUser)
-                .then(user => user ? res.json(user): res.status(422).send({error: "Failed to update user."}))
-                .catch(next);
+                .then(data => res.json({
+                    meta,
+                    data
+                }))
+                .catch(error => res.status(400).send({
+                    meta,
+                    error: {
+                        message: error
+                    }
+                }))
+                .finally(next);
         });
 }
 
@@ -106,13 +125,13 @@ function getAll(req, res, next) {
     const meta = {}
     userService.getAll()
         .then(data => {
-        meta.total = data.length;
-        res.json({
-            meta,
-            data
+            meta.total = data.length;
+            res.json({
+                meta,
+                data
+            })
         })
-    })
-        .catch(error => res.json({
+        .catch(error => res.status(400).send({
             meta,
             error: {
                 message: error
@@ -141,7 +160,7 @@ function getById(req, res, next) {
             meta,
             data
         }))
-        .catch(error => res.json({
+        .catch(error => res.status(400).send({
             meta,
             error: {
                 message: error
@@ -164,7 +183,7 @@ function changePassword(req, res, next) {
             meta,
             data
         }))
-        .catch(error => res.json({
+        .catch(error => res.status(400).send({
             meta,
             error: {
                 message: error
