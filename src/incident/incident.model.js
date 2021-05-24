@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     typeOfIncident: { type: String, required: true },
-    location: { type: String, unique: true, required: true },
+    location: { type: String,  required: true },
     datetimeOfIncident: { type: String, required: true },
     nameOfAffected: { type: String, required: true },
     nameOfSupervisor: { type: String, required: true },

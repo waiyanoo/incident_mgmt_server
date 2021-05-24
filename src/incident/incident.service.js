@@ -53,6 +53,7 @@ async function create(data) {
         return incident;
     }
     catch (e) {
+        console.log(e);
         throw 'Failed to create incident data'
     }
 }
