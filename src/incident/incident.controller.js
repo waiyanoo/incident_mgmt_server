@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const db = require('src/_helpers/db');
 const authorize = require('src/_middleware/authorize');
 const userService = require('../user/user.service');
 const Role = require('src/_helpers/role');
@@ -46,20 +47,25 @@ function getById(req, res, next) {
  * @param res
  * @param next
  */
-function getAll(req, res, next) {
+async function getAll(req, res, next) {
     const options = req.query;
     const sort = options.sort || {};
     const filter = options.filter || {};
-    const meta = {sort, filter};
+    const page = options.page;
+    const pageSize = options.pageSize;
+    const meta = {sort, filter, page, pageSize};
     let currentUser = null;
+    let totalRecord = 0;
+    await _incidentService.getTotalCount(filter).then(data => totalRecord = data);
+
     userService.getById(req.user.id)
         .then(user => {
             currentUser = user;
-            _incidentService.getAll(filter, sort)
+            _incidentService.getAll(filter, sort, page, pageSize)
                 .then(data => {
-                    meta.total = data.length;
-
-                    if(currentUser.role === 'User'){
+                    //meta.total = db.Incident.countDocuments({isActive: true});
+                    meta.total = totalRecord;
+                    if (currentUser.role === 'User') {
                         data = data.filter(incident => incident.nameOfHandler === currentUser.id);
                     }
                     res.json({

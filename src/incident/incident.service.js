@@ -6,6 +6,7 @@ module.exports = {
     getById,
     create,
     update,
+    getTotalCount
 };
 
 /**
@@ -27,18 +28,31 @@ async function getById(id) {
  * @param sort
  * @returns {Promise<Array<EnforceDocument<unknown, {}>>>}
  */
-async function getAll(filter, sort) {
+async function getAll(filter, sort, page, pageSize) {
     filter.isActive = true;
     let mongoFilter = {$and : []};
+    const skip = (page * pageSize);
     try{
         mongoFilter.$and.push({ isActive: true });
         filter.typeOfIncident ?  mongoFilter.$and.push({typeOfIncident : filter.typeOfIncident }) : '';
-        return await db.Incident.find(mongoFilter).sort().exec();
+        return await db.Incident.find(mongoFilter).sort(sort).skip(skip).limit(parseInt(pageSize, 10)).exec();
     }catch (e) {
         console.log(e);
         throw 'Failed to retrieve incident'
     }
 
+}
+
+async function getTotalCount(filter){
+    filter.isActive = true;
+    let mongoFilter = {$and : []};
+    try{
+        mongoFilter.$and.push({ isActive: true });
+        filter.typeOfIncident ?  mongoFilter.$and.push({typeOfIncident : filter.typeOfIncident }) : '';
+        return  db.Incident.countDocuments(filter);
+    } catch (e) {
+        return 0;
+    }
 }
 
 /***
