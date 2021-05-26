@@ -35,6 +35,7 @@ async function getAll(filter, sort, page, pageSize) {
     try{
         mongoFilter.$and.push({ isActive: true });
         filter.typeOfIncident ?  mongoFilter.$and.push({typeOfIncident : filter.typeOfIncident }) : '';
+        filter.nameOfHandler ? mongoFilter.$and.push({nameOfHandler : filter.nameOfHandler }) : '';
         return await db.Incident.find(mongoFilter).sort(sort).skip(skip).limit(parseInt(pageSize, 10)).exec();
     }catch (e) {
         console.log(e);
@@ -49,7 +50,8 @@ async function getTotalCount(filter){
     try{
         mongoFilter.$and.push({ isActive: true });
         filter.typeOfIncident ?  mongoFilter.$and.push({typeOfIncident : filter.typeOfIncident }) : '';
-        return  db.Incident.countDocuments(filter);
+        filter.nameOfHandler ? mongoFilter.$and.push({nameOfHandler : filter.nameOfHandler }) : '';
+        return await db.Incident.countDocuments(filter);
     } catch (e) {
         return 0;
     }

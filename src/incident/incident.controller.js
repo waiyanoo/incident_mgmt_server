@@ -56,18 +56,18 @@ async function getAll(req, res, next) {
     const meta = {sort, filter, page, pageSize};
     let currentUser = null;
     let totalRecord = 0;
-    await _incidentService.getTotalCount(filter).then(data => totalRecord = data);
+
 
     userService.getById(req.user.id)
-        .then(user => {
+        .then(async user => {
             currentUser = user;
+            if (currentUser.role === 'User') {
+                filter.nameOfHandler =currentUser.id
+            }
+            await _incidentService.getTotalCount(filter).then(data => totalRecord = data);
             _incidentService.getAll(filter, sort, page, pageSize)
                 .then(data => {
-                    //meta.total = db.Incident.countDocuments({isActive: true});
                     meta.total = totalRecord;
-                    if (currentUser.role === 'User') {
-                        data = data.filter(incident => incident.nameOfHandler === currentUser.id);
-                    }
                     res.json({
                         meta,
                         data
