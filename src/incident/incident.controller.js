@@ -10,6 +10,7 @@ const _incidentService = require('./incident.service');
 router.get('', authorize(), getAll);
 router.get('/:id', authorize(), getById);
 router.post('', authorize(Role.Admin), create);
+router.delete('/:id',authorize(Role.Admin), _delete);
 router.put('/:id', authorize(Role.Admin), update);
 router.post('/:id/acknowledge', authorize(), acknowledge);
 router.post('/:id/resolve', authorize(), resolve);
@@ -220,6 +221,32 @@ function resolve(req, res, next) {
                 .then(data => res.json({
                     meta,
                     data
+                }))
+                .catch(error => res.status(400).send({
+                    meta,
+                    error: {
+                        message: error
+                    }
+                }))
+                .finally(next);
+        });
+}
+
+
+function _delete(req, res, next) {
+    const id = req.params.id;
+    _incidentService.getById(id)
+        .then(response => {
+            const incident = new Incident(response);
+
+            incident.isActive = false;
+            incident.tsModified = Date.now();
+            incident.modifiedBy = req.user.id;
+            const meta = {};
+            _incidentService.update(id, incident)
+                .then(() => res.json({
+                    meta,
+                    data : {}
                 }))
                 .catch(error => res.status(400).send({
                     meta,
